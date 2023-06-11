@@ -1,9 +1,29 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser');
+const connectDB = require('./connect/connect')
+app.use(bodyParser.json())
 
-app.get('/testing',(req,res)=>{
-res.send("here I am chekcing if basix structue is working.")
-})
-app.listen(8080,()=>{
-  console.log("app is running on port 8080");
-})
+//importing routes
+const authRouter = require('./routes/User');
+app.use('/api/v1',authRouter);
+
+//connecting to data-base
+const port = process.env.PORT || 8080
+const start = async()=>{
+  try {
+    await connectDB(process.env.MONGO_URI)
+    console.log("Connected to database");
+     app.listen(port,()=>{
+      console.log(`Server is listening on  https://localhost:${port}...`);
+    })
+  } catch (error) {
+    console.log(`${error}, this error is in connecting database`);
+  }
+}
+
+start();
+
